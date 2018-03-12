@@ -1,0 +1,10 @@
+Package: io.github.nchugget.sleeknbouncy10
+Name: Sleek'n'Bouncy10
+Depends: mobilesubstrate
+Architecture: iphoneos-arm
+Description: An awesome MobileSubstrate tweak!
+Maintainer: James Hutchinson
+Author: James Hutchinson
+Section: Tweaks
+Version: 1.1-6+debug
+Installed-Size: 125
