@@ -3,7 +3,7 @@
 #include <spawn.h>
 #include <unistd.h>
 
-char *notablst[] = {"/bin/bash", "/Applications/Cydia.app", "/bin/sh", "/bin", "/Applications", "/usr/bin"}; //if I use a NSArray* the entire app breaks, what??
+char *notablst[] = {"/bin/bash", "/Applications/Cydia.app", "/bin/sh", "/bin", "/Applications", "/usr/bin", "/etc", "/var/lib"}; //if I use a NSArray* the entire app breaks, what??
 
 %hook AppsFlyerUtils
 +(BOOL)isJailbreakon {
@@ -32,7 +32,7 @@ char *notablst[] = {"/bin/bash", "/Applications/Cydia.app", "/bin/sh", "/bin", "
 %end
 
 MSHook(FILE *, fopen, const char* path, const char* mode) {
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 8; i++) {
         if (strstr(path, notablst[i])) {
             NSLog(@"FORTNITE: blocked %s", path);
             return NULL;
