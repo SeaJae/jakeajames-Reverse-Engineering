@@ -1,11 +1,28 @@
 #include <Foundation/Foundation.h>
 #include <mach-o/dyld.h>
+#include <spawn.h>
+#include <unistd.h>
 
-char *notablst[] = {"/bin/bash", "/Applications/Cydia.app", "/bin/sh", "/bin", "/Applications", ".safeMode"}; //if I use a NSArray* the entire app breaks, what??
+char *notablst[] = {"/bin/bash", "/Applications/Cydia.app", "/bin/sh", "/bin", "/Applications", "/usr/bin"}; //if I use a NSArray* the entire app breaks, what??
 
+%hook AppsFlyerUtils
++(BOOL)isJailbreakon {
+    NSLog(@"FORTNITE: AppsFlyerUtils isJailbreakOn, false");
+    return false;
+}
+%end
+%hook ANSMetadata
+- (BOOL)computeIsJailbroken {
+    NSLog(@"FORTNITE: ANSMetadata isJailbroken, false");
+    return false;
+}
+-(BOOL)isJailbroken {
+    return false;
+}
+%end
 %hook NSFileManager
 -(BOOL)fileExistsAtPath:(NSString *)path {
-    //NSLog(@"FORTNITE: filexsistsatpath: %@", path);
+    NSLog(@"FORTNITE: filexsistsatpath: %@", path);
     if ([path isEqualToString:@"/Applications/Cydia.app"] || [path isEqualToString:@"/bin/bash"] || [path isEqualToString:@"/bin/sh"]) { //same thing if I use the array here, the app just breaks, at least for me, it broke
         NSLog(@"FORTNITE: BLOCKED %@", path);
         return NO;
@@ -29,6 +46,23 @@ MSHook(pid_t, fork) {
     NSLog(@"FORTNITE: fork()");
     return -1;
 }
+MSHook(int, system, const char* cmd) {
+    NSLog(@"FORTNITE: system('%s')", cmd);
+    return -1;
+}
+
+MSHook(int, unlink, const char* path) {
+    NSLog(@"FORTNITE: unlink %s", path);
+    if (strstr(path, "Containers") != NULL || strstr(path, "containers") != NULL) {
+        return _unlink(path);
+    }
+    NSLog(@"FORTNITE: blocked %s", path);
+    return EACCES;
+}
+MSHook(int, symlink, const char *path1, const char *path2) {
+    NSLog(@"FORTNITE: symink %s -> %s", path1, path2);
+    return EACCES;
+}
 
 //taken from NoSub/Palbreak https://github.com/Skylerk99/PalBreak
 static void ppfix_image_added(const struct mach_header *mh, intptr_t slide) {
@@ -45,11 +79,15 @@ static void ppfix_image_added(const struct mach_header *mh, intptr_t slide) {
             dlclose(handle);
         }
     }
-    setenv("_SafeMode", "0", true); //this doesn't work, which according to what coolstar said and what I understood, it should've. Nevertheless manually going to safe mode and loading only this dylib also ain't enough, so I won't bother fixing this for now
+    setenv("_SafeMode", "0", true);
 }
 __attribute__((constructor)) static void initialize() {
     NSLog(@"FORTNITE: LOADED");
     MSHookFunction(fopen, MSHake(fopen));
     MSHookFunction(fork, MSHake(fork));
+    MSHookFunction(system, MSHake(system));
+    MSHookFunction(unlink, MSHake(unlink));
+    MSHookFunction(symlink, MSHake(symlink));
+    
     _dyld_register_func_for_add_image(&ppfix_image_added);
 }
