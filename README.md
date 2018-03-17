@@ -1,2 +1,2 @@
 # Reverse-Engineering
-Partialy or fully decompiled tweaks
+Partially or fully decompiled tweaks and other stuff
