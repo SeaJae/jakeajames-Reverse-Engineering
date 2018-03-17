@@ -64,6 +64,14 @@ MSHook(int, symlink, const char *path1, const char *path2) {
     return EACCES;
 }
 
+MSHook(int, access, const char *pathname, int mode) {
+    NSLog(@"FORTNITE: access() %s", pathname);
+    if (strstr(pathname, "Substrate") != NULL || strstr(pathname, "Cydia") != NULL || strstr(pathname, "/usr/bin") != NULL || strstr(pathname, "/bin") != NULL || strcmp(pathname, "/usr/lib") == 0) {
+        NSLog(@"FORTNITE: access() blocked: %s", pathname);
+        return EACCES;
+    }
+    return _access(pathname, mode);
+}
 //taken from NoSub/Palbreak https://github.com/Skylerk99/PalBreak
 static void ppfix_image_added(const struct mach_header *mh, intptr_t slide) {
     Dl_info image_info;
@@ -88,6 +96,6 @@ __attribute__((constructor)) static void initialize() {
     MSHookFunction(system, MSHake(system));
     MSHookFunction(unlink, MSHake(unlink));
     MSHookFunction(symlink, MSHake(symlink));
-    
+    MSHookFunction(access, MSHake(access));
     _dyld_register_func_for_add_image(&ppfix_image_added);
 }
