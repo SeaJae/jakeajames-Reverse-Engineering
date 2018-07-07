@@ -1,3 +1,5 @@
+//original author: theninjaprawn
+
 addr_t find_trustcache(void) {
     addr_t call, func;
     addr_t ref = find_strref("%s: only allowed process can check the trust cache", 1, 1);
