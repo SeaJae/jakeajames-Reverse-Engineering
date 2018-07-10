@@ -78,7 +78,7 @@ char *copyBootHash() {
     size_t size;
     char *hash;
     
-    if (chosen && choosen != -1) {
+    if (chosen && chosen != -1) {
         kern_return_t ret = IORegistryEntryGetProperty(chosen, "boot-manifest-hash", buf, &size);
         IOObjectRelease(chosen);
         
