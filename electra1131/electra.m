@@ -117,6 +117,10 @@ uint64_t get_vfs_context() {
     return zm_fix_addr(kexecute(offset_vfs_context_current, 1, 0, 0, 0, 0, 0));
 }
 
+int vnode_put(uint64_t vnode) {
+    return kexecute(offset_vnode_put, vnode, 0, 0, 0, 0, 0, 0);
+}
+
 uint64_t getVnodeAtPath(uint64_t vfs_context, const char *path) {
     uint64_t *vnode_ptr = (uint64_t *)malloc(8);
     if (vnode_lookup(path, 0, vnode_ptr, vfs_context)) {
@@ -142,7 +146,7 @@ char *find_system_snapshot() {
 }
 
 int remountRootAsRW(uint64_t kaslr, uint64_t kernproc, uint64_t ourproc, int snapshots) {
-    if (kCFCoreFoundationVersionNumber > 1451.51 && snapshots) {
+    if (kCFCoreFoundationVersionNumber > 1451.51 && snapshots) { //the second check makes it only run once; on iOS 11.3+ Electra creates no other snapshots;
         if (getOffsets(kaslr)) {
             uint64_t kern_ucred = rk64(kernproc + offsetof_p_ucred);
             uint64_t our_ucred = rk64(ourproc + offsetof_p_ucred);
@@ -204,7 +208,7 @@ int start_electra() {
     locknvram();
     printf("APFS Snapshots: \n");
     printf("=========\n");
-    list_snapshots("/");
+    int snapshots = list_snapshots("/");
     printf("=========\n");
     int rv = remountRootAsRW(kaslr, kernproc, selfproc, snapshots);
     ...
