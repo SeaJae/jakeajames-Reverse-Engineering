@@ -1,5 +1,5 @@
 
-uint64_t offset_vfs_context_current, offset_vnode_lookup, offset_vnode_lookup;
+uint64_t offset_vfs_context_current, offset_vnode_lookup, offset_vnode_put;
 
 int getOffsets(uint64_t kaslr) {
     char v3; //??
