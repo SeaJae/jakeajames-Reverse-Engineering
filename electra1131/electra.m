@@ -148,7 +148,7 @@ int remountRootAsRW(uint64_t kaslr, uint64_t kernproc, uint64_t ourproc, int sna
             uint64_t our_ucred = rk64(ourproc + offsetof_p_ucred);
             
             uint64_t context = get_vfs_context();
-            uint64_t devVnode = getVnodeAtPath("/dev/disk0s1s1");
+            uint64_t devVnode = getVnodeAtPath(path, "/dev/disk0s1s1");
             uint64_t specinfo = rk64(devVnode + offsetof_v_specinfo);
             
             wk32(specinfo + offsetof_si_flags, 0); //if you're coming from my code, that's offsetof_specflags, = to 0x10
