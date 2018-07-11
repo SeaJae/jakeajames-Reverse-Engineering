@@ -29,6 +29,9 @@ int getOffsets(uint64_t kaslr) {
     offset_vnode_lookup += kaslr;
     offset_vnode_lookup += kaslr;
     
+    tihmstar::offsetfinder64::~offsetfinder64((tihmstar::offsetfinder64 *)&v3);
+    
+    return 1; //always 1??
 }
 
 int list_snapshots(const char *vol)
@@ -95,6 +98,7 @@ char *copyBootHash() {
             ...
         }
     }
+    return hash;
 }
 
 int vnode_lookup(const char *path, int flags, uint64_t *vnode, uint64_t vfs_context) {
